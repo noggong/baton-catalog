@@ -38,6 +38,8 @@ catalog/<묶음-id>/
   "risk": {
     "shell": 3,
     "outbound": [
+      { "step": 4, "action": "http.request", "what": "티켓 번호와 Bearer 토큰",
+        "where": "api.example.com (헤더 authorization 에 secret:API_TOKEN)" },
       { "step": 7, "what": "테스트 결과 요약", "where": "$HOOK 입력값으로 받은 주소" }
     ]
   }
@@ -54,6 +56,8 @@ catalog/<묶음-id>/
 - [ ] 비밀값 · 토큰 · 사내 호스트 · 사내 티켓 키 · 개인 경로(`/Users/…`)가 없다
 - [ ] `shell` 명령을 **한 줄씩 다시 읽었다** — 남의 맥에서 돌아도 되는 명령뿐이다
 - [ ] 밖으로 나가는 스텝을 `risk.outbound` 에 **빠짐없이** 적었다(어디로 무엇이 가는지 포함)
+- [ ] `http.request` 가 있으면 **호스트**와 **헤더·쿼리·본문에 실리는 것**(`secret:` 포함)을 적었다 —
+      주소가 변수라 실행 때 정해지면 그렇게 적었다
 - [ ] 파일로 못 따라오는 의존을 `requires` 에 선언했다
 - [ ] 앱 기본 제공 워크플로우와 id·표시 이름이 겹치지 않는다
 

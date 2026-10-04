@@ -38,7 +38,39 @@ const STEP_META = new Set(['as', 'label', 'when', 'loop', 'output', 'retry', 'ti
  * 밖으로 나가는 액션. POLICY.md §3 의 신고 대상과 같은 목록이어야 한다 —
  * 늘리면 정책 문서도 같이 고친다.
  */
-const OUTBOUND_PREFIX = ['gh.', 'slack.', 'jira.'];
+const OUTBOUND_PREFIX = ['gh.', 'slack.', 'jira.', 'http.'];
+
+/**
+ * `http.request` 는 **주소를 정의가 고른다** — 다른 밖으로 나가는 액션과 갈리는 지점이다.
+ * `gh.*` 는 GitHub 로, `slack.*` 는 슬랙으로 가지만 이것은 **어디로든** 간다. 그래서 호스트를
+ * 뽑아 신고와 함께 적게 하고, 변수로 가려져 지금 알 수 없으면 그렇다고 적는다 —
+ * 「모른다」와 「없다」는 리뷰어에게 전혀 다른 뜻이다.
+ */
+function hostOfUrl(url) {
+  if (typeof url !== 'string' || url === '') return undefined;
+  if (url.includes('${') || url.startsWith('$')) return '실행 때 정해짐';
+  try {
+    return new URL(url).host;
+  } catch {
+    return undefined;
+  }
+}
+
+/** 값 안에 `secret:<키>` 가 있나 — 헤더·쿼리·본문 어디에 박혀 있어도 찾는다. */
+function secretsIn(value, out = []) {
+  if (typeof value === 'string') {
+    for (const m of value.matchAll(/secret:([A-Za-z_][A-Za-z0-9_]*)/g)) out.push(m[1]);
+    return out;
+  }
+  if (Array.isArray(value)) {
+    for (const v of value) secretsIn(v, out);
+    return out;
+  }
+  if (value !== null && typeof value === 'object') {
+    for (const v of Object.values(value)) secretsIn(v, out);
+  }
+  return out;
+}
 
 /**
  * `shell` 명령 안에서 **밖으로 나가는** 것과 **민감한 자리를 읽는** 것.
@@ -104,7 +136,20 @@ function scanRisk(def) {
       }
     }
     if (OUTBOUND_PREFIX.some((p) => action.startsWith(p))) {
-      out.outbound.push({ step: n, action, why: action });
+      const params = step[action] ?? {};
+      const host = hostOfUrl(params.url);
+      out.outbound.push({ step: n, action, why: host ? `${action} → ${host}` : action });
+      /**
+       * 「어디로」만으로는 승인할 수 없다 — 같은 주소라도 공개 조회와 토큰 송출은 다른 일이다.
+       * 헤더·쿼리·본문에 실리는 `secret:` 을 따로 짚는다.
+       */
+      const secrets = [...new Set(secretsIn(params))];
+      if (secrets.length > 0) {
+        out.flags.push(`${n}번 스텝이 저장된 비밀값을 실어 보냅니다 (${secrets.join(' · ')})`);
+      }
+      if (host === '실행 때 정해짐') {
+        out.flags.push(`${n}번 스텝의 주소가 변수라 지금은 어디로 가는지 알 수 없습니다`);
+      }
     }
   });
   return out;
