@@ -1,0 +1,13 @@
+{
+  "name": "baton-catalog",
+  "private": true,
+  "type": "module",
+  "description": "Baton 워크플로우·에이전트 카탈로그",
+  "scripts": {
+    "index": "node scripts/pack-catalog.mjs",
+    "check": "node scripts/pack-catalog.mjs --check"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}

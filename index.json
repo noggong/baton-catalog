@@ -1,5 +1,32 @@
 {
   "schema": 1,
-  "generatedAt": null,
-  "packs": []
+  "packs": [
+    {
+      "id": "tldr-repo",
+      "title": "레포 한눈에",
+      "description": "레포를 처음 여는 사람을 위해 구조·진입점·규율을 다섯 줄로 요약합니다. 코드는 바꾸지 않습니다.",
+      "version": "1.0.0",
+      "author": "noggong",
+      "requires": {
+        "setup": [],
+        "mcp": [],
+        "skill": []
+      },
+      "usesBundled": [],
+      "risk": {
+        "shell": 0,
+        "outbound": []
+      },
+      "files": [
+        {
+          "path": "agents/tldr-writer.md",
+          "sha256": "ac3844accb86dfd2ffed12dada8d6b4becf6b56b28f3aab9715408e04c881762"
+        },
+        {
+          "path": "workflow.yaml",
+          "sha256": "5ea3ae74871d22c59adc7d6297234ba881df8c4bdebad39ee8d66ee673bbf354"
+        }
+      ]
+    }
+  ]
 }

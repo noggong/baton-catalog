@@ -1,0 +1,16 @@
+{
+  "id": "tldr-repo",
+  "title": "레포 한눈에",
+  "description": "레포를 처음 여는 사람을 위해 구조·진입점·규율을 다섯 줄로 요약합니다. 코드는 바꾸지 않습니다.",
+  "version": "1.0.0",
+  "author": "noggong",
+  "requires": {
+    "setup": [],
+    "mcp": [],
+    "skill": []
+  },
+  "risk": {
+    "shell": 0,
+    "outbound": []
+  }
+}

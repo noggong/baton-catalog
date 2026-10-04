@@ -1,0 +1,18 @@
+id: tldr-repo
+title: 레포 한눈에
+description: 레포의 구조·진입점·규율을 다섯 줄로 요약합니다. 읽기만 하고 코드는 바꾸지 않습니다.
+inputs:
+  worktree:
+    type: worktree
+    label: 대상 (기본 worktree)
+    options: "$worktrees.base"
+    help: 읽기만 하므로 기본 worktree 에서 돌려도 됩니다.
+steps:
+  - session.open: { scope: worktree, targetId: "${worktree.id}", title: "레포 한눈에" }
+    as: session
+    label: 세션 열기
+  - agent.prompt: { terminal: "${session.handle}", agent: tldr-writer }
+    label: 요약 지시
+  - agent.await: { terminal: "${session.handle}" }
+    as: summary
+    label: 요약 받기

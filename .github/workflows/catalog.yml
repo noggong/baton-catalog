@@ -1,0 +1,28 @@
+# 카탈로그 검사 (S459).
+#
+# `pull_request` 로만 돈다 — **`pull_request_target` 을 쓰지 않는다.** 그쪽은 fork 의 코드를
+# 베이스 레포의 권한과 시크릿으로 돌려서, fork PR 하나가 토큰을 가져가는 전형적인 구멍이 된다.
+# 이 검사는 시크릿이 필요 없다.
+name: catalog
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm ci
+      # 구조 · 묶음이 스스로 완결하는가 · **위험 신고와 실제 대조** · index.json 이 최신인가.
+      # index.json 은 CI 가 커밋하지 않는다(보호된 브랜치에 쓰지 않는다) — 올리는 사람이
+      # `npm run index` 를 돌려 함께 커밋하고, 여기서는 **같은지만** 본다.
+      - run: npm run check
